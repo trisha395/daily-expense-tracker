@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Expense Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-bar-chart"></i> Reports & Analytics</h2>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Expenses</h5>
+                <h2 class="text-danger">${{ total_expenses|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <h5 class="card-title">Total Income</h5>
+                <h2 class="text-success">${{ total_income|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Summary -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5><i class="bi bi-calendar-month"></i> Monthly Summary (Last 6 Months)</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th class="text-danger">Expenses</th>
+                        <th class="text-success">Income</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in monthly_data %}
+                    <tr>
+                        <td><strong>{{ data.month }}</strong></td>
+                        <td class="text-danger">${{ data.expenses|floatformat:2 }}</td>
+                        <td class="text-success">${{ data.income|floatformat:2 }}</td>
+                        <td>
+                            {% if data.income >= data.expenses %}
+                            <span class="text-success">${{ data.income|add:"-"|add:data.expenses|floatformat:2 }}</span>
+                            {% else %}
+                            <span class="text-danger">-${{ data.expenses|add:"-"|add:data.income|floatformat:2 }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Category-wise Expenses -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="bi bi-pie-chart"></i> Category-wise Expenses</h5>
+    </div>
+    <div class="card-body">
+        {% if category_expenses %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in category_expenses %}
+                    <tr>
+                        <td>
+                            <i class="bi bi-tag"></i>
+                            {% if cat.category__name %}
+                            {{ cat.category__name }}
+                            {% else %}
+                            <em>Uncategorized</em>
+                            {% endif %}
+                        </td>
+                        <td class="text-danger"><strong>${{ cat.total|floatformat:2 }}</strong></td>
+                        <td>
+                            {% if total_expenses > 0 %}
+                            {% widthratio cat.total total_expenses 100 %}%
+                            {% else %}
+                            0%
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No expense data available.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

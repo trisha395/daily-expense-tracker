@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Expense Manager{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+        <p class="text-muted">Welcome back, {{ user.username }}!</p>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card border-danger">
+            <div class="card-body text-center">
+                <i class="bi bi-receipt text-danger" style="font-size: 2rem;"></i>
+                <h5 class="card-title mt-2">Total Expenses</h5>
+                <h3 class="text-danger">${{ total_expenses|floatformat:2 }}</h3>
+                <small class="text-muted">This Month: ${{ current_month_expenses|floatformat:2 }}</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card border-success">
+            <div class="card-body text-center">
+                <i class="bi bi-cash-coin text-success" style="font-size: 2rem;"></i>
+                <h5 class="card-title mt-2">Total Income</h5>
+                <h3 class="text-success">${{ total_income|floatformat:2 }}</h3>
+                <small class="text-muted">This Month: ${{ current_month_income|floatformat:2 }}</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card border-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-wallet2 text-primary" style="font-size: 2rem;"></i>
+                <h5 class="card-title mt-2">Current Balance</h5>
+                <h3 class="{% if balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    ${{ balance|floatformat:2 }}
+                </h3>
+                <small class="text-muted">Income - Expenses</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Quick Actions</h5>
+                <a href="{% url 'expense_create' %}" class="btn btn-danger me-2">
+                    <i class="bi bi-plus-circle"></i> Add Expense
+                </a>
+                <a href="{% url 'income_create' %}" class="btn btn-success me-2">
+                    <i class="bi bi-plus-circle"></i> Add Income
+                </a>
+                <a href="{% url 'category_create' %}" class="btn btn-secondary me-2">
+                    <i class="bi bi-plus-circle"></i> Add Category
+                </a>
+                <a href="{% url 'reports' %}" class="btn btn-primary">
+                    <i class="bi bi-bar-chart"></i> View Reports
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-receipt"></i> Recent Expenses
+            </div>
+            <div class="card-body">
+                {% if recent_expenses %}
+                <div class="list-group list-group-flush">
+                    {% for expense in recent_expenses %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">{{ expense.title }}</h6>
+                            <small class="text-muted">{{ expense.date }} - {{ expense.category }}</small>
+                        </div>
+                        <span class="badge bg-danger rounded-pill">${{ expense.amount }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'expense_list' %}" class="btn btn-sm btn-outline-danger">View All</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No expenses yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <i class="bi bi-cash-coin"></i> Recent Income
+            </div>
+            <div class="card-body">
+                {% if recent_incomes %}
+                <div class="list-group list-group-flush">
+                    {% for income in recent_incomes %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">{{ income.source }}</h6>
+                            <small class="text-muted">{{ income.date }}</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">${{ income.amount }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{% url 'income_list' %}" class="btn btn-sm btn-outline-success">View All</a>
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No income yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
